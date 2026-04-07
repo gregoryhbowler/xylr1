@@ -8,31 +8,41 @@ extern "C" {
 /// Opaque handle to a Plaits voice instance.
 typedef void* PlaitsVoiceHandle;
 
-/// Create a new Plaits voice. Returns a handle.
-PlaitsVoiceHandle plaits_create(float sample_rate);
+/// Create a new Plaits voice. Call once per voice.
+/// The voice runs at Plaits' native 48kHz sample rate internally.
+PlaitsVoiceHandle plaits_create(void);
 
-/// Destroy a Plaits voice.
+/// Destroy a Plaits voice and free its memory.
 void plaits_destroy(PlaitsVoiceHandle handle);
 
-/// Set the synthesis model (0-23).
-void plaits_set_model(PlaitsVoiceHandle handle, int model);
-
-/// Set the base frequency in Hz.
-void plaits_set_frequency(PlaitsVoiceHandle handle, float frequency);
-
-/// Set the three main parameters (all 0.0-1.0).
-void plaits_set_parameters(PlaitsVoiceHandle handle,
-                           float harmonics,
-                           float timbre,
-                           float morph);
-
-/// Set the trigger state (gate on/off).
-void plaits_set_trigger(PlaitsVoiceHandle handle, int trigger);
-
-/// Render a block of audio into the output buffer.
-/// output must point to at least sample_count floats.
+/// Render a block of audio.
+///
+/// Parameters:
+///   handle       - Voice handle from plaits_create()
+///   engine       - Synthesis model index (0-23)
+///   note         - MIDI-style note number (e.g., 60.0 = middle C)
+///   harmonics    - HARMONICS parameter (0.0 - 1.0)
+///   timbre       - TIMBRE parameter (0.0 - 1.0)
+///   morph        - MORPH parameter (0.0 - 1.0)
+///   trigger      - 1.0 for note-on trigger, 0.0 for sustain/release
+///   level        - Amplitude level (0.0 - 1.0), or -1.0 for unpatched
+///   decay        - LPG decay (0.0 - 1.0)
+///   lpg_colour   - LPG colour / filter (0.0 - 1.0)
+///   out          - Output buffer (float, at least sample_count elements)
+///   aux          - Auxiliary output buffer (float, at least sample_count), or NULL
+///   sample_count - Number of samples to render (will be processed in blocks of 12)
 void plaits_render(PlaitsVoiceHandle handle,
-                   float* output,
+                   int engine,
+                   float note,
+                   float harmonics,
+                   float timbre,
+                   float morph,
+                   float trigger,
+                   float level,
+                   float decay,
+                   float lpg_colour,
+                   float* out,
+                   float* aux,
                    int sample_count);
 
 #ifdef __cplusplus

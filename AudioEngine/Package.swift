@@ -19,11 +19,14 @@ let package = Package(
         .target(
             name: "PlaitsLib",
             path: "Sources/Plaits",
-            sources: ["plaits_bridge.cpp"],
             publicHeadersPath: "include",
             cxxSettings: [
+                // Include paths so Plaits headers resolve correctly:
+                // "plaits/dsp/voice.h" resolves from Sources/Plaits/
+                // "stmlib/stmlib.h" resolves from Sources/Plaits/
                 .headerSearchPath("."),
-                .define("PLAITS_STANDALONE", to: "1"),
+                // Define TEST to use mock flash/user_data (no STM32 hardware)
+                .define("TEST"),
             ]
         ),
         .testTarget(

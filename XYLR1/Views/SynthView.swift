@@ -123,32 +123,33 @@ struct SynthView: View {
     }
 }
 
-/// Plaits model parameter labels — extracted for reuse.
+/// Plaits model parameter labels — matches engine registration order in voice.cc.
+/// Models 1-8 = v1.2 "orange bank", 9-24 = original engines.
 enum PlaitsModelLabels {
     static let labels: [(harmonics: String, timbre: String, morph: String)] = [
-        ("Detuning", "Pulse width", "Waveshape"),
-        ("Waveshape", "Fold", "Asymmetry"),
-        ("FM ratio", "FM amount", "Feedback"),
-        ("Interval", "Formant freq", "Formant width"),
-        ("Harm spread", "Spectral peak", "Bump shape"),
-        ("Row", "Column", "Interpolation"),
-        ("Chord type", "Inversion", "Waveform"),
-        ("Phoneme", "Formant shift", "Speed"),
-        ("Pitch rand", "Grain density", "Grain dur"),
-        ("Filter type", "Cutoff freq", "Resonance"),
-        ("Density", "Filter freq", "Freq random"),
-        ("Inharm", "Brightness", "Damping"),
-        ("Freq ratio", "Brightness", "Damping"),
-        ("Decay", "Pitch mod", "Tone/click"),
-        ("Noise amt", "Tone freq", "Decay"),
-        ("Tone cluster", "Tone freq", "Decay"),
-        ("Resonance", "Filter cut", "Wave/sub"),
-        ("Dist freq", "Dist amount", "Dist asym"),
-        ("Preset sel", "Mod level", "Env travel"),
-        ("Preset sel", "Mod level", "Env travel"),
-        ("Preset sel", "Mod level", "Env travel"),
-        ("Terrain", "Path radius", "Path offset"),
-        ("Chord", "Chorus/flt", "Waveform"),
-        ("Chord", "Arp type", "PW/Sync"),
+        ("Resonance", "Filter cut", "Wave/sub"),       //  1: Classic WF + Filter
+        ("Dist freq", "Dist amount", "Dist asym"),      //  2: Phase Distortion
+        ("Preset sel", "Mod level", "Env travel"),      //  3: 6-Op FM (A)
+        ("Preset sel", "Mod level", "Env travel"),      //  4: 6-Op FM (B)
+        ("Preset sel", "Mod level", "Env travel"),      //  5: 6-Op FM (C)
+        ("Terrain", "Path radius", "Path offset"),      //  6: Wave Terrain
+        ("Chord", "Chorus/flt", "Waveform"),            //  7: String Machine
+        ("Chord", "Arp type", "PW/Sync"),               //  8: Var Square Chords
+        ("Detuning", "Pulse width", "Waveshape"),       //  9: Virtual Analog
+        ("Waveshape", "Fold", "Asymmetry"),             // 10: Waveshaper
+        ("FM ratio", "FM amount", "Feedback"),          // 11: FM
+        ("Interval", "Formant freq", "Formant width"),  // 12: Grain / Formant
+        ("Harm spread", "Spectral peak", "Bump shape"), // 13: Harmonic Additive
+        ("Row", "Column", "Interpolation"),             // 14: Wavetable
+        ("Chord type", "Inversion", "Waveform"),        // 15: Chord
+        ("Phoneme", "Formant shift", "Speed"),          // 16: Speech / Vowel
+        ("Pitch rand", "Grain density", "Grain dur"),   // 17: Granular Cloud
+        ("Filter type", "Cutoff freq", "Resonance"),    // 18: Filtered Noise
+        ("Density", "Filter freq", "Freq random"),      // 19: Particle Noise
+        ("Inharm", "Brightness", "Damping"),            // 20: Inharmonic String
+        ("Freq ratio", "Brightness", "Damping"),        // 21: Modal Resonator
+        ("Decay", "Pitch mod", "Tone/click"),           // 22: Analog Bass Drum
+        ("Noise amt", "Tone freq", "Decay"),            // 23: Analog Snare Drum
+        ("Tone cluster", "Tone freq", "Decay"),         // 24: Analog Hi-Hat
     ]
 }

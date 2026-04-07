@@ -15,12 +15,13 @@ public final class PlaitsVoice {
     public func noteOn(midiNote: UInt8, velocity: UInt8) {
         self.midiNote = midiNote
         self.isActive = true
-        let frequency = Self.midiNoteToFrequency(midiNote)
-        plaits.setFrequency(frequency)
+        plaits.note = Float(midiNote)
+        plaits.trigger()
         envelope.gate(on: true)
     }
 
     public func noteOff() {
+        plaits.release()
         envelope.gate(on: false)
     }
 
