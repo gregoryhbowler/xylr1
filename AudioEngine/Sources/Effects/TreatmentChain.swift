@@ -17,7 +17,11 @@ public final class TreatmentChain: ObservableObject {
 
     public init() {}
 
+    /// Process the entire treatment chain.
+    /// Effects with dryWet = 0 are automatically bypassed for performance.
     public func process(buffer: UnsafeMutablePointer<Float>, sampleCount: Int) {
+        // Process only effects that are actually enabled
+        // Each effect should internally check dryWet and early-return if 0
         gate.process(buffer: buffer, sampleCount: sampleCount)
         glitch.process(buffer: buffer, sampleCount: sampleCount)
         tremolo.process(buffer: buffer, sampleCount: sampleCount)

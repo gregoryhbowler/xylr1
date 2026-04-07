@@ -24,7 +24,7 @@ public final class AudioEngine: ObservableObject {
     // MARK: - Constants
 
     public static let sampleRate: Double = 44100
-    public static let preferredBufferSize: UInt32 = 128
+    public static let preferredBufferSize: UInt32 = 256 // Increased from 128 for better stability
     public static let maxLayers = 4
     public static let voicesPerLayer = 8
 
@@ -41,7 +41,8 @@ public final class AudioEngine: ObservableObject {
     private func setupAudioSession() {
         let session = AVAudioSession.sharedInstance()
         do {
-            try session.setCategory(.playback, options: .mixWithOthers)
+            // Use .playAndRecord for better audio unit support
+            try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .mixWithOthers])
             try session.setPreferredSampleRate(Self.sampleRate)
             try session.setPreferredIOBufferDuration(
                 Double(Self.preferredBufferSize) / Self.sampleRate
@@ -70,8 +71,43 @@ public final class AudioEngine: ObservableObject {
             tempoRatio: tempoRatio
         )
         layers.append(layer)
-        // In a full implementation, attach layer's audio node to the mixer
+        
+        // Attach layer's audio source node to the mixer
+        let layerNode = createLayerSourceNode(for: layer)
+        engine.attach(layerNode)
+        
+        let format = AVAudioFormat(
+            standardFormatWithSampleRate: Self.sampleRate,
+            channels: 2
+        )
+        engine.connect(layerNode, to: mixerNode, format: format)
+        
         return layer
+    }
+    
+    /// Creates an AVAudioSourceNode that renders audio for a given layer.
+    private func createLayerSourceNode(for layer: LayerEngine) -> AVAudioSourceNode {
+        let format = AVAudioFormat(
+            standardFormatWithSampleRate: Self.sampleRate,
+            channels: 2
+        )!
+        
+        return AVAudioSourceNode(format: format) { [weak layer] _, _, frameCount, audioBufferList in
+            guard let layer = layer else { return noErr }
+            
+            let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
+            
+            // Zero out buffers
+            for buffer in ablPointer {
+                memset(buffer.mData, 0, Int(buffer.mDataByteSize))
+            }
+            
+            // TODO: Render actual audio from layer's voices here
+            // This is where you'd call into your C++ Plaits voices
+            // For now, this prevents overload by providing silence
+            
+            return noErr
+        }
     }
 
     // MARK: - Start / Stop
