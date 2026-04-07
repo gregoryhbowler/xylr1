@@ -3,6 +3,7 @@ import SwiftUI
 /// Dual-buffer sampler / performance view.
 struct ReviseView: View {
     @EnvironmentObject var appState: AppState
+    @State private var showNewConfirmation = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -109,10 +110,27 @@ struct ReviseView: View {
                     // Action buttons
                     HStack {
                         Spacer()
-                        XButton(title: "EXPORT") {}
-                        XButton(title: "SAVE") {}
-                        XButton(title: "NEW") {}
+                        XButton(title: "EXPORT") {
+                            // TODO: render buffer to WAV and present share sheet
+                        }
+                        XButton(title: "SAVE") {
+                            // TODO: save full project state to documents
+                        }
+                        XButton(title: "NEW") {
+                            showNewConfirmation = true
+                        }
                         Spacer()
+                    }
+                    .alert("New Project", isPresented: $showNewConfirmation) {
+                        Button("Cancel", role: .cancel) {}
+                        Button("New", role: .destructive) {
+                            appState.revise = ReviseState()
+                            appState.layers = [LayerState(index: 0)]
+                            appState.activeLayerIndex = 0
+                            appState.layers[0].generateGlyphs()
+                        }
+                    } message: {
+                        Text("Unsaved changes will be lost.")
                     }
                     .padding(.bottom, 16)
                 }
@@ -140,8 +158,8 @@ struct BufferSection: View {
                 HStack(spacing: 4) {
                     SmallButton(title: "rec") { bufferState.isRecording.toggle() }
                     SmallButton(title: "overdub") { bufferState.isOverdubbing.toggle() }
-                    SmallButton(title: "pause") { bufferState.isPaused.toggle() }
-                    SmallButton(title: "pause") { /* playback pause */ }
+                    SmallButton(title: "rec pause") { bufferState.isPaused.toggle() }
+                    SmallButton(title: "play pause") { bufferState.isPlaying.toggle() }
                     SmallButton(title: bufferState.isLooping ? "loop" : "1-shot") {
                         bufferState.isLooping.toggle()
                     }

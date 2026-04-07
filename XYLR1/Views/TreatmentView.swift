@@ -60,7 +60,7 @@ struct TreatmentView: View {
             // Undo
             HStack {
                 Spacer()
-                XButton(title: "UNDO", style: .filled) {}
+                XButton(title: "UNDO", style: .filled) { appState.undo() }
                 Spacer()
             }
             .padding(.bottom, 16)

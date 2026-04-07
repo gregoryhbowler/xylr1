@@ -135,7 +135,7 @@ struct AnimationView: View {
                     HStack {
                         Spacer()
                         XButton(title: "UNDO", style: .filled) {
-                            // Undo last randomization
+                            appState.undo()
                         }
                         Spacer()
                     }
@@ -165,6 +165,7 @@ struct EffectRow: View {
     let name: String
     @Binding var dryWet: Float
     var onRandomize: (() -> Void)? = nil
+    @State private var showPercent = false
 
     var body: some View {
         HStack(spacing: 8) {
@@ -174,6 +175,8 @@ struct EffectRow: View {
                 .frame(width: 60, alignment: .leading)
 
             Button {
+                // Full randomize this effect's dry/wet
+                dryWet = Float.random(in: 0...100)
                 onRandomize?()
             } label: {
                 Text(">>")
@@ -183,16 +186,17 @@ struct EffectRow: View {
             .buttonStyle(.plain)
 
             Button {
-                // Toggle D/W display
+                showPercent.toggle()
             } label: {
                 Text("D/W")
                     .font(XTheme.valueFont)
-                    .foregroundColor(XTheme.primary)
+                    .foregroundColor(showPercent ? XTheme.controlBorder : XTheme.primary)
             }
             .buttonStyle(.plain)
 
             XSlider(label: "", value: $dryWet, range: 0...100,
-                    minLabel: "0%", maxLabel: "100%")
+                    minLabel: showPercent ? "\(Int(dryWet))%" : "0%",
+                    maxLabel: "100%")
         }
     }
 }

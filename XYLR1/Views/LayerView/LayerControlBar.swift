@@ -1,4 +1,5 @@
 import SwiftUI
+import AudioEngine
 
 /// Bottom control bar for the layer view — groups, loop controls, navigation buttons.
 struct LayerControlBar: View {
@@ -51,28 +52,28 @@ struct LayerControlBar: View {
 
             HStack(spacing: 4) {
                 XButton(title: "RANDOMIZE") {
+                    appState.saveUndoSnapshot()
                     layer.generateGlyphs()
                 }
                 XButton(title: "PATCH") {
                     randomizePatch()
                 }
                 XButton(title: "NOTES") {
+                    appState.saveUndoSnapshot()
                     layer.generateGlyphs()
                 }
                 XButton(title: "MOD") {
-                    // Randomize LFO parameters
+                    randomizeMod()
                 }
                 XButton(title: "UNDO", style: .filled) {
-                    if let snapshot = layer.undoSnapshot {
-                        layer = snapshot
-                    }
+                    appState.undo()
                 }
             }
         }
     }
 
     private func randomizePatch() {
-        layer.undoSnapshot = layer
+        appState.saveUndoSnapshot()
         layer.model = Int.random(in: 1...24)
         layer.harmonics = Float.random(in: 0...1)
         layer.timbre = Float.random(in: 0...1)
@@ -83,5 +84,25 @@ struct LayerControlBar: View {
         layer.decayTime = Float.random(in: 0.01...3)
         layer.sustainLevel = Float.random(in: 0...1)
         layer.releaseTime = Float.random(in: 0.01...4)
+        appState.syncSynthParams()
+    }
+
+    private func randomizeMod() {
+        appState.saveUndoSnapshot()
+        // Randomize LFO parameters for current layer
+        guard appState.activeLayerIndex < appState.audioEngine.layers.count else { return }
+        let engine = appState.audioEngine.layers[appState.activeLayerIndex]
+        engine.lfo1.shape = LFOShape.allCases.randomElement()!
+        engine.lfo1.destination1 = LFODestination.allCases.randomElement()!
+        engine.lfo1.destination2 = LFODestination.allCases.randomElement()!
+        engine.lfo1.amount1 = Float.random(in: 0...1)
+        engine.lfo1.amount2 = Float.random(in: 0...1)
+        engine.lfo1.rate = Float.random(in: 0.1...10)
+        engine.lfo2.shape = LFOShape.allCases.randomElement()!
+        engine.lfo2.destination1 = LFODestination.allCases.randomElement()!
+        engine.lfo2.destination2 = LFODestination.allCases.randomElement()!
+        engine.lfo2.amount1 = Float.random(in: 0...1)
+        engine.lfo2.amount2 = Float.random(in: 0...1)
+        engine.lfo2.rate = Float.random(in: 0.1...10)
     }
 }
