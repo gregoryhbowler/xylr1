@@ -7,9 +7,9 @@ struct XSlider: View {
     let label: String
     @Binding var value: Float
     var range: ClosedRange<Float> = 0...1
+    var step: Float? = nil
     var minLabel: String? = nil
     var maxLabel: String? = nil
-    var step: Float? = nil
     var formatValue: ((Float) -> String)? = nil
 
     private var normalizedValue: CGFloat {

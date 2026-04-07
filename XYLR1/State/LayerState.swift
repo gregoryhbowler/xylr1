@@ -106,6 +106,10 @@ struct LayerState: Identifiable {
     let id = UUID()
     let index: Int
 
+    init(index: Int) {
+        self.index = index
+    }
+
     // Scale / key
     var rootNote: RootNote = .c
     var scaleMode: ScaleMode = .major
@@ -136,8 +140,12 @@ struct LayerState: Identifiable {
     var tempoNumerator: Int = 1
     var tempoDenominator: Int = 1
 
-    // Undo snapshot
-    var undoSnapshot: LayerState? = nil
+    // Undo snapshot (boxed to avoid recursive value type)
+    private var _undoSnapshot: [LayerState] = []
+    var undoSnapshot: LayerState? {
+        get { _undoSnapshot.first }
+        set { _undoSnapshot = newValue.map { [$0] } ?? [] }
+    }
 
     // MARK: - Note Generation
 
